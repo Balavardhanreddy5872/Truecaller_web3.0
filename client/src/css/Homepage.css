@@ -1,0 +1,75 @@
+body {
+    margin: 0;
+    padding: 0;
+    /* background: url('C:\Users\91994\Desktop\SEM5\BTA\Truecaller web3\client\public\images\images.jpeg') no-repeat center center fixed; */
+    background-color: lightskyblue;
+    background-size: cover;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-size: cover;
+    padding: 20px;
+    text-align: left;
+}
+
+.container h1 {
+    font-size: 48px;
+    color: #333;
+    opacity: 0;
+    animation: fadeIn 3s forwards, slideDown 3s forwards;
+    animation-iteration-count: infinite;
+    animation-delay: 3s;
+}
+
+
+.button {
+    padding: 10px 20px;
+    background: black;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    opacity: 0;
+    animation: fadeIn 2s 1s forwards, slideUp 2s 1s forwards;
+}
+
+button:hover {
+    background: black;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    0% {
+        transform: translateY(-20px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    0% {
+        transform: translateY(20px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
