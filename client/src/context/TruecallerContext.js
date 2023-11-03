@@ -122,9 +122,9 @@ export const Transactionprovider = ({ children }) => {
                 const callerArray = await transaction.getAllCallerInfo();
 
                 const allnumber = callerArray.map((number) => ({
-                    Name: number.name,
-                    Number: number.mobileNumber,
-                    email: number.email,
+                    Name: number.mobileNumber,
+                    Number: number.email,
+                    email: number.name,
                     spam: number.isSpam,
                     spamcount: number.spamCount
                 }));

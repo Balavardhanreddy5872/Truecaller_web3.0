@@ -20,7 +20,7 @@ contract Truecaller {
         string name,
         string email
     );
-    event SpamReported(bytes32 indexed mobileNumberHash, uint256 spamCount);
+    event SpamReported(bytes32 indexed mobileNumberHash, uint256 spamCount, bool isSpam);
     event SpamReportCleared(bytes32 indexed mobileNumberHash);
 
     uint256 public constant spamCooldown = 1 minutes;
@@ -28,9 +28,7 @@ contract Truecaller {
     mapping(string => bool) private registeredMobileNumbers;
     mapping(string => bool) private registeredEmails;
 
-    function hashMobileNumber(
-        string memory mobileNumber
-    ) internal pure returns (bytes32) {
+    function hashMobileNumber(string memory mobileNumber) internal pure returns (bytes32) {
         return keccak256(abi.encodePacked(mobileNumber));
     }
 
@@ -109,9 +107,20 @@ contract Truecaller {
         }
 
         callers[mobileNumberHash].lastReportTime = block.timestamp;
+
+        // Update the isSpam and spamCount in the callerArray
+        for (uint i = 0; i < callerArray.length; i++) {
+            if (keccak256(abi.encodePacked(callerArray[i].mobileNumber)) == mobileNumberHash) {
+                callerArray[i].isSpam = true;
+                callerArray[i].spamCount = callers[mobileNumberHash].spamCount;
+                break;
+            }
+        }
+
         emit SpamReported(
             mobileNumberHash,
-            callers[mobileNumberHash].spamCount
+            callers[mobileNumberHash].spamCount,
+            true
         );
     }
 
@@ -128,21 +137,20 @@ contract Truecaller {
         );
         callers[mobileNumberHash].spamCount = 0;
         callers[mobileNumberHash].isSpam = false;
-        for (uint256 i = 0; i < spamMobileNumbers.length; i++) {
-            if (spamMobileNumbers[i] == mobileNumberHash) {
-                spamMobileNumbers[i] = spamMobileNumbers[
-                    spamMobileNumbers.length - 1
-                ];
-                spamMobileNumbers.pop();
+
+        // Update the isSpam and spamCount in the callerArray
+        for (uint i = 0; i < callerArray.length; i++) {
+            if (keccak256(abi.encodePacked(callerArray[i].mobileNumber)) == mobileNumberHash) {
+                callerArray[i].isSpam = false;
+                callerArray[i].spamCount = 0;
                 break;
             }
         }
+
         emit SpamReportCleared(mobileNumberHash);
     }
 
-    function isIndianMobileNumber(
-        string memory mobileNumber
-    ) internal pure returns (bool) {
+    function isIndianMobileNumber(string memory mobileNumber) internal pure returns (bool) {
         bytes memory mobileBytes = bytes(mobileNumber);
         if (mobileBytes.length != 10) {
             return false;
@@ -151,9 +159,7 @@ contract Truecaller {
         return (firstChar == "7" || firstChar == "8" || firstChar == "9");
     }
 
-    function containsAtSymbol(
-        string memory email
-    ) internal pure returns (bool) {
+    function containsAtSymbol(string memory email) internal pure returns (bool) {
         bytes memory emailBytes = bytes(email);
         for (uint256 i = 0; i < emailBytes.length; i++) {
             if (emailBytes[i] == "@") {

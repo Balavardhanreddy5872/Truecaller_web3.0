@@ -1,5 +1,5 @@
 import abi from './Truecaller.json';
 
 export const contractABI = abi.abi;
-export const contract_Address = '0xa8881c1fdB8314da9Ae8336e867d306E05EE5873';
+export const contract_Address = '0x7368cC2E1aFB5Ba02Cf54ddeb2BeC640C87EE1cE';
 
