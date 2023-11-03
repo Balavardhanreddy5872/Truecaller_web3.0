@@ -15,7 +15,6 @@ const Find = () => {
   };
 
   const handleSpam = (email) => {
-    // Write your logic to handle spam reports here
     console.log(`Reported spam for mobile number: ${email}`);
   };
 

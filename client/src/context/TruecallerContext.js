@@ -116,7 +116,7 @@ export const Transactionprovider = ({ children }) => {
     const [searchResult, setSearchResult] = useState([]); // Define state for search results
     const searchNumber = async () => {
         try {
-            
+
             if (ethereum) {
                 const transaction = getEthereumContract();
                 const callerArray = await transaction.getAllCallerInfo();
@@ -138,13 +138,36 @@ export const Transactionprovider = ({ children }) => {
     }
     /*<------------------------------------------Search a Number ------------------------------------------------------------>.*/
 
+    const [spamresult, setSpamresult] = useState([]);
+    const spamsearchNumber = async () => {
+        try {
+            if (ethereum) {
+                const transaction = getEthereumContract();
+                const spamCallers = await transaction.getAllSpamNumbers();
+
+                const spamNumbers = spamCallers[0].map((number, index) => ({
+                    mobileNumber: number, // Use number here instead of spamCallers[0][index]
+                    name: spamCallers[1][index],
+                    email: spamCallers[2][index],
+                    isSpam: spamCallers[3][index],
+                    spamCount: spamCallers[4][index],
+                }));
+
+                setSpamresult(spamNumbers);
+                console.log(spamresult);
+            }
+        } catch (error) {
+            console.error('Error fetching spam numbers:', error);
+        }
+    }
+
 
     useEffect(() => {
         checkIfWalletIsConnected();
         // Searchcaller();
     }, []);
     return (
-        <TruecallerContext.Provider value={{ connectWallet, currentAccount, formData, handleChange, AddCaller, data, handlesearch, searchNumber ,searchResult}}>
+        <TruecallerContext.Provider value={{ connectWallet, currentAccount, formData, handleChange, AddCaller, data, handlesearch, searchNumber, searchResult,spamsearchNumber }}>
             {children}
         </TruecallerContext.Provider>
     );
