@@ -6,13 +6,14 @@ contract Truecaller {
         string mobileNumber;
         string name;
         string email;
+        uint256 spamCount;
         bool isSpam;
         uint256 lastReportTime;
-        uint256 spamCount;
     }
 
     mapping(bytes32 => Caller) public callers;
     bytes32[] public spamMobileNumbers;
+    Caller[] public callerArray;
 
     event CallerRegistered(
         bytes32 indexed mobileNumberHash,
@@ -38,63 +39,25 @@ contract Truecaller {
         string memory name,
         string memory email
     ) public {
+        Caller memory newCaller = Caller({
+            mobileNumber: mobileNumber,
+            name: name,
+            email: email,
+            spamCount: 0,
+            isSpam: false,
+            lastReportTime: 0
+        });
+
         bytes32 mobileNumberHash = hashMobileNumber(mobileNumber);
 
-        // Validation: Ensure the mobile number is a 10-digit Indian number
-        require(
-            bytes(mobileNumber).length == 10,
-            "Mobile number must be 10 digits"
-        );
-        require(
-            isIndianMobileNumber(mobileNumber),
-            "Invalid Indian mobile number"
-        );
+        callers[mobileNumberHash] = newCaller;
+        callerArray.push(newCaller);
 
-        // Validation: Ensure the email contains the "@" symbol
-        require(containsAtSymbol(email), "Invalid email format");
-
-        // Validation: Check that the name has a minimum length of 5 characters
-        require(bytes(name).length >= 5, "Name must be at least 5 characters");
-
-        // Check if the mobile number and email are already registered
-        require(
-            !registeredMobileNumbers[mobileNumber],
-            "Mobile number already registered"
-        );
-        require(!registeredEmails[email], "Email already registered");
-
-        // Mark the mobile number and email as registered
-        registeredMobileNumbers[mobileNumber] = true;
-        registeredEmails[email] = true;
-
-        // Register the caller
-        callers[mobileNumberHash] = Caller(
-            mobileNumber,
-            name,
-            email,
-            false,
-            0,
-            0
-        );
         emit CallerRegistered(mobileNumberHash, name, email);
     }
 
-    function getCallerInfo(
-        string memory mobileNumber
-    )
-        public
-        view
-        returns (string memory, string memory, string memory, bool, uint256)
-    {
-        bytes32 mobileNumberHash = hashMobileNumber(mobileNumber);
-        Caller storage caller = callers[mobileNumberHash];
-        return (
-            caller.name,
-            caller.email,
-            caller.mobileNumber,
-            caller.isSpam,
-            caller.spamCount
-        );
+    function getAllCallerInfo() public view returns (Caller[] memory) {
+        return callerArray;
     }
 
     function getAllSpamNumbers()
@@ -105,7 +68,7 @@ contract Truecaller {
             string[] memory,
             string[] memory,
             bool[] memory,
-            uint[] memory
+            uint256[] memory
         )
     {
         bytes32[] memory mobileNumbers = new bytes32[](
@@ -114,7 +77,7 @@ contract Truecaller {
         string[] memory names = new string[](spamMobileNumbers.length);
         string[] memory emails = new string[](spamMobileNumbers.length);
         bool[] memory isSpamStatus = new bool[](spamMobileNumbers.length);
-        uint[] memory spamCounts = new uint[](spamMobileNumbers.length);
+        uint256[] memory spamCounts = new uint256[](spamMobileNumbers.length);
 
         for (uint i = 0; i < spamMobileNumbers.length; i++) {
             bytes32 mobileNumberHash = spamMobileNumbers[i];

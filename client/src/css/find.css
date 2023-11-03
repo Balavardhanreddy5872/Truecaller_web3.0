@@ -1,0 +1,35 @@
+/* Add your CSS styles here */
+.container {
+    text-align: center;
+    margin: 20px;
+  }
+  
+  h1 {
+    font-size: 24px;
+  }
+  
+  button {
+    padding: 10px 20px;
+    background: #0074D9;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+  }
+  
+  .number-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .number-table th, .number-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+  }
+  
+  .red-background {
+    background-color: red;
+  }
+  
+  /* Add more CSS styles as needed */
+  
