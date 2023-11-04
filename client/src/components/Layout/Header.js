@@ -22,13 +22,10 @@ const Header = () => {
               <li className="nav-item mx-4">
                 <NavLink className="nav-link " to="/aboutus"> <i class="fa-solid fa-address-card fa-beat"></i>  Aboutus</NavLink>
               </li>
-              <li className="nav-item mx-4">
-                <NavLink className="nav-link " to="/spam"> <i class="fa-solid fa-bug"></i> Spam</NavLink>
-              </li>
             </ul>
             <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
               <li className="nav-item ">
-                <NavLink className="nav-link " to="/login"> <i class="fa-regular fa-user fa-beat-fade"></i> Login</NavLink>
+                <NavLink className="nav-link " to="/login"> <i class="fa-regular fa-user fa-beat-fade"></i> Add </NavLink>
               </li>
             </ul>
           </div>

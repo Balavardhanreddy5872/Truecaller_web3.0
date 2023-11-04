@@ -138,36 +138,58 @@ export const Transactionprovider = ({ children }) => {
     }
     /*<------------------------------------------Search a Number ------------------------------------------------------------>.*/
 
-    const [spamresult, setSpamresult] = useState([]);
-    const spamsearchNumber = async () => {
-        try {
-            if (ethereum) {
-                const transaction = getEthereumContract();
-                const spamCallers = await transaction.getAllSpamNumbers();
 
-                const spamNumbers = spamCallers[0].map((number, index) => ({
-                    mobileNumber: number, // Use number here instead of spamCallers[0][index]
-                    name: spamCallers[1][index],
-                    email: spamCallers[2][index],
-                    isSpam: spamCallers[3][index],
-                    spamCount: spamCallers[4][index],
-                }));
+    //////
 
-                setSpamresult(spamNumbers);
-                console.log(spamresult);
-            }
-        } catch (error) {
-            console.error('Error fetching spam numbers:', error);
+    const addSpam = async (phoneNumber) => {
+        const contract = getEthereumContract()
+        const estimatedGas = await contract.estimateGas.reportSpam(phoneNumber);
+        const gasLimit = estimatedGas.mul(120).div(100);
+        await ethereum.request({
+            method: "eth_sendTransaction",
+            params: [{
+                from: currentAccount,
+                to: contract_Address,
+                gas: "0x1555208",
+                gasLimit: gasLimit
+            }],
+        });
+        const txn = await contract.reportSpam(phoneNumber);
+        const receipt = await txn.wait();
+        if (receipt.status === 1) {
+            // Update the caller array with 'Yes' for isSpam and set spamCount to 1
+            const callerArray = await contract.getAllCallerInfo();
+            callerArray.forEach((caller) => {
+                if (caller.mobileNumber === phoneNumber) {
+                    caller.isSpam = 'yes';
+                    caller.spamCount = 1;
+                }
+            });
+    
+            // Log that spam has been reported
+            console.log('Spam reported');
+            console.log(callerArray); // Log the updated caller array
         }
+        console.log(phoneNumber);
+
+         
     }
 
+    const getAllSpam = async () => {
+        const contract = getEthereumContract()
+        // const numbers = await contract.returnSpamNumbersWithInfo()
+
+        const numbers = await contract.getAllSpamNumbers();
+        console.log(numbers)
+        return numbers;
+    }
 
     useEffect(() => {
         checkIfWalletIsConnected();
         // Searchcaller();
     }, []);
     return (
-        <TruecallerContext.Provider value={{ connectWallet, currentAccount, formData, handleChange, AddCaller, data, handlesearch, searchNumber, searchResult,spamsearchNumber }}>
+        <TruecallerContext.Provider value={{ connectWallet, currentAccount, formData, handleChange, AddCaller, data, addSpam, getAllSpam, handlesearch, searchNumber, searchResult }}>
             {children}
         </TruecallerContext.Provider>
     );

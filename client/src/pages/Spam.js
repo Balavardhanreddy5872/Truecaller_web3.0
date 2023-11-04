@@ -3,10 +3,12 @@ import Layout from '../components/Layout/Layout'
 import { TruecallerContext } from '../context/TruecallerContext';
 
 const Spam = () => {
-  const { spamsearchNumber } = useContext(TruecallerContext);
-  const handleSubmit = (e) => {
+  const { getAllSpam } = useContext(TruecallerContext);
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    spamsearchNumber();
+    const nums = await getAllSpam()
+    console.log(nums)
+    // spamsearchNumber();
   }
   return (
     <Layout>
