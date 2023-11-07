@@ -3,27 +3,26 @@ import Layout from '../components/Layout/Layout';
 import { TruecallerContext } from '../context/TruecallerContext';
 
 const Login = () => {
-  
   const { formData, handleChange, AddCaller } = useContext(TruecallerContext);
 
   const handleSubmit = (e) => {
-    const { email, mobileNumber, Name } = formData;
     e.preventDefault();
+    const { email, mobileNumber, Name } = formData;
+    if (!email || !email.includes('@')) {
+      alert("Please enter a valid email address.");
+      return;
+    }
     
-    if (!email) {
-      alert("Email is required");
+    if (!Name || Name.length < 5) {
+      alert("Name should be at least 5 characters long.");
       return;
     }
-    if (!Name) {
-      alert("Name is required");
+
+    if (!mobileNumber || !/^[0-9]{10}$/.test(mobileNumber)) {
+      alert("Please enter a 10-digit Indian mobile number.");
       return;
     }
-    if (!mobileNumber) {
-      alert("Mobile Number is required");
-      return;
-    }
-  
-    // adding Addcaller props.
+
     AddCaller();
   };
 

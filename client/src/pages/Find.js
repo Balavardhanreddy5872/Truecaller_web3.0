@@ -168,8 +168,6 @@ const Find = () => {
       <br/>
       <br/>
       <br/>
-
-
     </Layout>
   );
 };

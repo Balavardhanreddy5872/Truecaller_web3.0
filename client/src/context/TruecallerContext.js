@@ -19,21 +19,14 @@ const getEthereumContract = () => {
 
 export const Transactionprovider = ({ children }) => {
     const [currentAccount, setCurrentAccount] = useState("");
-
-    /*<------------------------------------------ Adds to TrueCaller  form------------------------------------------------------------>.*/
     const [formData, setformData] = useState({ email: '', mobileNumber: '', Name: '' });
-    // handle change for the form 
     const handleChange = (e, name) => {
         setformData((prevState) => ({ ...prevState, [name]: e.target.value }));
     };
-    /*<------------------------------------------Adds to TrueCaller  form------------------------------------------------------------>.*/
-    /*<------------------------------------------ Search a Number state ------------------------------------------------------------>.*/
     const [data, setData] = useState({ search: "" });
     const handlesearch = (e, name) => {
         setData((prevState) => ({ ...prevState, [name]: e.target.value }));
     }
-    /*<------------------------------------------Search a Number state ------------------------------------------------------------>.*/
-
 
     //<--------- Main ----------------->
     // 2.Checking if wallet is connected.
@@ -53,7 +46,7 @@ export const Transactionprovider = ({ children }) => {
 
     }
 
-    /*<------------------------------------------ 1.connecting to Metamask wallet ------------------------------------------------------------>.*/
+    // 1.connecting to Metamask wallet
     const connectWallet = async () => {
         try {
             if (!ethereum) return alert("please Install metamask");
@@ -64,7 +57,7 @@ export const Transactionprovider = ({ children }) => {
         }
     }
 
-    /*<------------------------------------------3.Adds to TrueCaller ------------------------------------------------------------>.*/
+    // 3. Adds to TrueCaller 
     const AddCaller = async () => {
 
         try {
@@ -108,12 +101,10 @@ export const Transactionprovider = ({ children }) => {
 
         }
     };
-    /*<------------------------------------------Adds to TrueCaller  form------------------------------------------------------------>.*/
 
+    // 4. Get all Numbers Number
 
-    /*<------------------------------------------4. Get all Numbers Number ------------------------------------------------------------>.*/
-
-    const [searchResult, setSearchResult] = useState([]); // Define state for search results
+    const [searchResult, setSearchResult] = useState([]);
     const searchNumber = async () => {
         try {
 
@@ -127,14 +118,15 @@ export const Transactionprovider = ({ children }) => {
                     email: number.name,
                 }));
 
-                setSearchResult(allnumber); // Update the state with search results
+                setSearchResult(allnumber);
                 console.log(allnumber);
             }
         } catch (error) {
             console.log(error);
         }
     }
-    
+
+
     //5. Add  a Number to spam 
 
     const addSpam = async (phoneNumber) => {
@@ -154,22 +146,18 @@ export const Transactionprovider = ({ children }) => {
             const txn = await contract.reportSpam(phoneNumber, { gasLimit });
             const receipt = await txn.wait();
             if (receipt.status === 1) {
-                const callerArray = await contract.getAllCallerInfo();
-                callerArray.forEach((caller) => {
-                    if (caller.mobileNumber === phoneNumber) {
-                        caller.isSpam = true;
-                    }
-                });
                 console.log('Spam reported');
-                console.log(callerArray);
+            }
+            else {
+                console.error('Error in Reporting Spam');
             }
         } catch (error) {
             console.error('Error reporting spam:', error);
         }
-    
+
         console.log(phoneNumber);
     }
-    
+
 
     // 6. Removes Numbers from a spam
 
@@ -186,32 +174,52 @@ export const Transactionprovider = ({ children }) => {
                 gasLimit: gasLimit
             }],
         });
-    
+
         try {
             const txn = await contract.removeSpam(phoneNumber, { gasLimit });
             const receipt = await txn.wait();
             if (receipt.status === 1) {
-                const callerArray = await contract.getAllCallerInfo();
-                callerArray.forEach((caller) => {
-                    if (caller.mobileNumber === phoneNumber) {
-                        caller.isSpam = false;
-                    }
-                });
                 console.log('Spam removed');
-                console.log(callerArray); 
             }
         } catch (error) {
             console.error('Error removing spam:', error);
         }
-    
+
         console.log(phoneNumber);
     }
-    
+
+
+    // 7. Search a Number 
+    const [search, setSearch] = useState([]);
+    const searchValue = async (mobileNumber) => {
+        try {
+            if (ethereum) {
+                const transaction = getEthereumContract();
+                const callerArray = await transaction.getAllCallerInfo();
+
+                const filteredData = callerArray.filter((caller) =>
+                    caller.email === mobileNumber
+                );
+
+                if (filteredData.length > 0) {
+                    setSearch(filteredData);
+                    console.log(filteredData);
+                } else {
+                    console.log("Caller not found.");
+                }
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    // 8. UseEffect Hook 
     useEffect(() => {
         checkIfWalletIsConnected();
     }, []);
+
     return (
-        <TruecallerContext.Provider value={{ connectWallet, currentAccount, formData, handleChange, AddCaller, data, addSpam, handlesearch, searchNumber, searchResult ,removeSpam}}>
+        <TruecallerContext.Provider value={{ connectWallet, currentAccount, formData, handleChange, AddCaller, data, addSpam, handlesearch, searchNumber, searchResult, removeSpam, searchValue, search }}>
             {children}
         </TruecallerContext.Provider>
     );
