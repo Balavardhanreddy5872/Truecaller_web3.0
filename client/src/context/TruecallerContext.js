@@ -111,7 +111,7 @@ export const Transactionprovider = ({ children }) => {
     /*<------------------------------------------Adds to TrueCaller  form------------------------------------------------------------>.*/
 
 
-    /*<------------------------------------------4. Search a Number ------------------------------------------------------------>.*/
+    /*<------------------------------------------4. Get all Numbers Number ------------------------------------------------------------>.*/
 
     const [searchResult, setSearchResult] = useState([]); // Define state for search results
     const searchNumber = async () => {
@@ -125,8 +125,6 @@ export const Transactionprovider = ({ children }) => {
                     Name: number.mobileNumber,
                     Number: number.email,
                     email: number.name,
-                    spam: number.isSpam,
-                    spamcount: number.spamCount
                 }));
 
                 setSearchResult(allnumber); // Update the state with search results
@@ -136,13 +134,11 @@ export const Transactionprovider = ({ children }) => {
             console.log(error);
         }
     }
-    /*<------------------------------------------Search a Number ------------------------------------------------------------>.*/
-
-
-    //////
+    
+    //5. Add  a Number to spam 
 
     const addSpam = async (phoneNumber) => {
-        const contract = getEthereumContract()
+        const contract = getEthereumContract();
         const estimatedGas = await contract.estimateGas.reportSpam(phoneNumber);
         const gasLimit = estimatedGas.mul(120).div(100);
         await ethereum.request({
@@ -154,42 +150,68 @@ export const Transactionprovider = ({ children }) => {
                 gasLimit: gasLimit
             }],
         });
-        const txn = await contract.reportSpam(phoneNumber);
-        const receipt = await txn.wait();
-        if (receipt.status === 1) {
-            // Update the caller array with 'Yes' for isSpam and set spamCount to 1
-            const callerArray = await contract.getAllCallerInfo();
-            callerArray.forEach((caller) => {
-                if (caller.mobileNumber === phoneNumber) {
-                    caller.isSpam = 'yes';
-                    caller.spamCount = 1;
-                }
-            });
-    
-            // Log that spam has been reported
-            console.log('Spam reported');
-            console.log(callerArray); // Log the updated caller array
+        try {
+            const txn = await contract.reportSpam(phoneNumber, { gasLimit });
+            const receipt = await txn.wait();
+            if (receipt.status === 1) {
+                const callerArray = await contract.getAllCallerInfo();
+                callerArray.forEach((caller) => {
+                    if (caller.mobileNumber === phoneNumber) {
+                        caller.isSpam = true;
+                    }
+                });
+                console.log('Spam reported');
+                console.log(callerArray);
+            }
+        } catch (error) {
+            console.error('Error reporting spam:', error);
         }
+    
         console.log(phoneNumber);
-
-         
     }
+    
 
-    const getAllSpam = async () => {
-        const contract = getEthereumContract()
-        // const numbers = await contract.returnSpamNumbersWithInfo()
+    // 6. Removes Numbers from a spam
 
-        const numbers = await contract.getAllSpamNumbers();
-        console.log(numbers)
-        return numbers;
+    const removeSpam = async (phoneNumber) => {
+        const contract = getEthereumContract();
+        const estimatedGas = await contract.estimateGas.removeSpam(phoneNumber);
+        const gasLimit = estimatedGas.mul(120).div(100);
+        await ethereum.request({
+            method: "eth_sendTransaction",
+            params: [{
+                from: currentAccount,
+                to: contract_Address,
+                gas: "0x1555208",
+                gasLimit: gasLimit
+            }],
+        });
+    
+        try {
+            const txn = await contract.removeSpam(phoneNumber, { gasLimit });
+            const receipt = await txn.wait();
+            if (receipt.status === 1) {
+                const callerArray = await contract.getAllCallerInfo();
+                callerArray.forEach((caller) => {
+                    if (caller.mobileNumber === phoneNumber) {
+                        caller.isSpam = false;
+                    }
+                });
+                console.log('Spam removed');
+                console.log(callerArray); 
+            }
+        } catch (error) {
+            console.error('Error removing spam:', error);
+        }
+    
+        console.log(phoneNumber);
     }
-
+    
     useEffect(() => {
         checkIfWalletIsConnected();
-        // Searchcaller();
     }, []);
     return (
-        <TruecallerContext.Provider value={{ connectWallet, currentAccount, formData, handleChange, AddCaller, data, addSpam, getAllSpam, handlesearch, searchNumber, searchResult }}>
+        <TruecallerContext.Provider value={{ connectWallet, currentAccount, formData, handleChange, AddCaller, data, addSpam, handlesearch, searchNumber, searchResult ,removeSpam}}>
             {children}
         </TruecallerContext.Provider>
     );

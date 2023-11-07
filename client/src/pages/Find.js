@@ -3,7 +3,7 @@ import Layout from '../components/Layout/Layout';
 import { TruecallerContext } from '../context/TruecallerContext';
 
 const Find = () => {
-  const { searchNumber, searchResult} = useContext(TruecallerContext);
+  const { searchNumber, searchResult,addSpam,removeSpam} = useContext(TruecallerContext);
   const [spamData, setSpamData] = useState([]);
   const [spamTableData, setSpamTableData] = useState([]);
 
@@ -22,15 +22,15 @@ const Find = () => {
     }
   };
 
-  const handleSpam = (number, name, email) => {
+  const handleSpam = async (number, name, email) => {
     const existingData = spamData.find((data) => data.number === number);
 
     if (existingData) {
       existingData.spamcount += 1;
       setSpamData([...spamData]);
-      // addspam();
       alert(`${number} added to  spam`);
     } else {
+      await addSpam(number);
       const newSpamData = [...spamData, { number, name, email, spamcount: 1 }];
       setSpamData(newSpamData);
       setSpamTableData(newSpamData);
@@ -38,7 +38,8 @@ const Find = () => {
     }
   };
 
-  const removeFromSpam = (number) => {
+  const removeFromSpam = async(number) => {
+    await removeSpam(number);
     const updatedSpamData = spamData.map((data) => {
       if (data.number === number) {
         if (data.spamcount > 1) {
@@ -47,7 +48,6 @@ const Find = () => {
           return null;
         }
         alert(`${number} removed from spam`);
-        // removespam();
       }
       return data;
     });
@@ -57,7 +57,6 @@ const Find = () => {
 
   const getSpamData = () => {
     setSpamData([...spamTableData]);
-    // getAllspam();
   };
 
   useEffect(() => {
