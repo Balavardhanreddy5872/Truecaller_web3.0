@@ -1,7 +1,7 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, Fragment } from 'react';
 import Layout from '../components/Layout/Layout';
 import { TruecallerContext } from '../context/TruecallerContext';
-
+import image from '../images/Eo_circle_green_checkmark.svg.png'
 const Aboutus = () => {
   const { searchValue, search } = useContext(TruecallerContext);
   const [mobileNumber, setMobileNumber] = useState('');
@@ -10,6 +10,23 @@ const Aboutus = () => {
     if (mobileNumber.trim() !== '') {
       searchValue(mobileNumber);
     }
+  };
+
+  const verificationStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    marginTop: '10px',
+  };
+
+  const tickStyle = {
+    width: '40px',
+    height: '40px',
+    marginRight: '10px',
+  };
+
+  const verificationText = {
+    color: 'green',
+    fontSize: '40px',
   };
 
   return (
@@ -31,11 +48,17 @@ const Aboutus = () => {
         <div style={resultsContainerStyle}>
           <ul style={resultsListStyle}>
             {search.map((result, index) => (
-              <li key={index} style={resultItemStyle}>
-                <p>Name: {result.mobileNumber}</p>
-                <p>Email: {result.name}</p>
-                <p>Number: {result.email}</p>
-              </li>
+              <Fragment key={index}>
+                <li style={resultItemStyle}>
+                  <p>Name: {result.mobileNumber}</p>
+                  <p>Email: {result.name}</p>
+                  <p>Number: {result.email}</p>
+                </li>
+                <div style={verificationStyle}>
+                  <img src={image} alt="Tick Icon" style={tickStyle} /><br/>
+                  <p style={verificationText}>Verified by Truecaller</p>
+                </div>
+              </Fragment>
             ))}
           </ul>
         </div>

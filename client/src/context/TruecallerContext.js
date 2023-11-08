@@ -68,8 +68,6 @@ export const Transactionprovider = ({ children }) => {
                 const gasLimit = estimatedGas.mul(120).div(100);
 
                 if (mobileNumber) {
-                    console.log(mobileNumber);
-
                     await ethereum.request({
                         method: "eth_sendTransaction",
                         params: [{
@@ -84,8 +82,7 @@ export const Transactionprovider = ({ children }) => {
 
                     console.log(`Loading - ${transactionHash.hash}`);
                     await transactionHash.wait();
-                    console.log(`Success - ${transactionHash.hash}`);
-                    alert("Added to Truecaller");
+                    alert(`Sucess-${transactionHash}, Added to truecaller`);
                 } else {
                     console.log("Mobile is undefined or empty.");
                 }
@@ -96,7 +93,7 @@ export const Transactionprovider = ({ children }) => {
             }
 
         } catch (error) {
-            console.log('failed to add to blockchain');
+            alert('failed to add to truecaller');
             console.log(error)
 
         }
